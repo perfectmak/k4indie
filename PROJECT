@@ -10,4 +10,14 @@ plugins:
   scorecard.sdk.operatorframework.io/v2: {}
 projectName: operator
 repo: github.com/perfectmak/k4indie
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: k4indie.io
+  group: operators.k4indie.io
+  kind: Application
+  path: github.com/perfectmak/k4indie/api/v1alpha1
+  version: v1alpha1
 version: "3"
