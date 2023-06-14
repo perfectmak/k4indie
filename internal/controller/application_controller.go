@@ -24,7 +24,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	operatorsk4indieiov1alpha1 "github.com/perfectmak/k4indie/api/v1alpha1"
+	operatorsv1alpha1 "github.com/perfectmak/k4indie/api/v1alpha1"
 )
 
 // ApplicationReconciler reconciles a Application object
@@ -33,9 +33,9 @@ type ApplicationReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=operators.k4indie.io.k4indie.io,resources=applications,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=operators.k4indie.io.k4indie.io,resources=applications/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=operators.k4indie.io.k4indie.io,resources=applications/finalizers,verbs=update
+//+kubebuilder:rbac:groups=operators.k4indie.io,resources=applications,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=operators.k4indie.io,resources=applications/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=operators.k4indie.io,resources=applications/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -57,6 +57,6 @@ func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 // SetupWithManager sets up the controller with the Manager.
 func (r *ApplicationReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&operatorsk4indieiov1alpha1.Application{}).
+		For(&operatorsv1alpha1.Application{}).
 		Complete(r)
 }

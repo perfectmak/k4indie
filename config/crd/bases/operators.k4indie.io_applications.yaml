@@ -1,12 +1,13 @@
+---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.11.1
   creationTimestamp: null
-  name: applications.operators.k4indie.io.k4indie.io
+  name: applications.operators.k4indie.io
 spec:
-  group: operators.k4indie.io.k4indie.io
+  group: operators.k4indie.io
   names:
     kind: Application
     listKind: ApplicationList
@@ -47,9 +48,3 @@ spec:
     storage: true
     subresources:
       status: {}
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: null
-  storedVersions: null

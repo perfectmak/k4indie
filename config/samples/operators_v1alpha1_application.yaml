@@ -1,4 +1,4 @@
-apiVersion: operators.k4indie.io.k4indie.io/v1alpha1
+apiVersion: operators.k4indie.io/v1alpha1
 kind: Application
 metadata:
   labels:

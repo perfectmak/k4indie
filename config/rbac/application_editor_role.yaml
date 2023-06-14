@@ -12,7 +12,7 @@ metadata:
   name: application-editor-role
 rules:
 - apiGroups:
-  - operators.k4indie.io.k4indie.io
+  - operators.k4indie.io
   resources:
   - applications
   verbs:
@@ -24,7 +24,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - operators.k4indie.io.k4indie.io
+  - operators.k4indie.io
   resources:
   - applications/status
   verbs:
