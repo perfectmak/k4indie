@@ -1,0 +1,49 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: '[]'
+    capabilities: Basic Install
+  name: operator.v0.0.0
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: Application is the Schema for the applications API
+      displayName: Application
+      kind: Application
+      name: applications.operators.k4indie.io.k4indie.io
+      version: v1alpha1
+  description: A Kubernetes operator providing Heroku-like experience for Indie Hackers.
+  displayName: k4indie
+  icon:
+  - base64data: ""
+    mediatype: ""
+  install:
+    spec:
+      deployments: null
+    strategy: ""
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - indie
+  - paas
+  - heroku
+  links:
+  - name: Operator
+    url: https://operator.domain
+  maintainers:
+  - email: perfect@k4indie.io
+    name: Perfect Makanju
+  maturity: alpha
+  provider:
+    name: k4indie
+  version: 0.0.0
