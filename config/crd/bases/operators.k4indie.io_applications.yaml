@@ -35,10 +35,23 @@ spec:
           spec:
             description: ApplicationSpec defines the desired state of Application
             properties:
-              foo:
-                description: Foo is an example field of Application. Edit application_types.go
-                  to remove/update
+              replicas:
+                description: Replicas is the number of instances of this application
+                  that should be created.
                 type: string
+              runtime:
+                description: Runtime configuration to run this application.
+                properties:
+                  size:
+                    description: Size is the type of resources required to the application
+                      should run on. Possible values are from the predefined types.
+                    enum:
+                    - basic
+                    - basic-2x
+                    - standard-2x
+                    - performance
+                    type: string
+                type: object
             type: object
           status:
             description: ApplicationStatus defines the observed state of Application

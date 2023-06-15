@@ -20,16 +20,21 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
+type ApplicationRuntime struct {
+	// Size is the type of resources required to the application should run on.
+	// Possible values are from the predefined types.
+	Size RuntimeSize `json:"size,omitempty"`
+}
 
 // ApplicationSpec defines the desired state of Application
 type ApplicationSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// Runtime configuration to run this application.
+	// +operator-sdk:csv:customresourcedefinitions:type=spec
+	Runtime ApplicationRuntime `json:"runtime,omitempty"`
 
-	// Foo is an example field of Application. Edit application_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// Replicas is the number of instances of this application that should be created.
+	// +operator-sdk:csv:customresourcedefinitions:type=spec
+	Replicas string `json:"replicas,omitempty"`
 }
 
 // ApplicationStatus defines the observed state of Application
