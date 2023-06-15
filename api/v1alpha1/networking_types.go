@@ -27,8 +27,8 @@ func (e *ApplicationEndpoint) AsContainerPort() corev1.ContainerPort {
 func (e *ApplicationEndpoints) AsContainerPorts() []corev1.ContainerPort {
 	ports := make([]corev1.ContainerPort, len(*e))
 
-	for _, endpoint := range *e {
-		ports = append(ports, endpoint.AsContainerPort())
+	for i, endpoint := range *e {
+		ports[i] = endpoint.AsContainerPort()
 	}
 
 	return ports

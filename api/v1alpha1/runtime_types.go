@@ -1,6 +1,9 @@
 package v1alpha1
 
-import "errors"
+import (
+	"errors"
+	"strings"
+)
 
 // +kubebuilder:validation:Enum=basic;basic-2x;standard-2x;performance
 type RuntimeSize string
@@ -28,3 +31,18 @@ var RuntimeSizes = map[RuntimeSize]struct{}{
 }
 
 var ErrInvalidRuntimeSize = errors.New("invalid runtime size")
+
+type RuntimeImage string
+
+func (r RuntimeImage) Tag() string {
+	splits := strings.Split(string(r), ":")
+	if len(splits) < 2 {
+		return "unknown"
+	}
+
+	return splits[1]
+}
+
+func (r RuntimeImage) String() string {
+	return string(r)
+}

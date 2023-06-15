@@ -10,6 +10,6 @@ spec:
   replicas: 1
   # command: []
   runtime:
-    image: nginxdemos/hello
+    image: nginxinc/nginx-unprivileged
     size: basic
 

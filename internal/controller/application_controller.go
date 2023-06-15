@@ -58,7 +58,7 @@ var (
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
 func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	log := log.FromContext(ctx).WithValues("application", req.NamespacedName.String())
+	log := log.FromContext(ctx)
 
 	appToReconcile := &operatorsv1alpha1.Application{}
 	err := r.Get(ctx, req.NamespacedName, appToReconcile)
@@ -91,7 +91,7 @@ func (r *ApplicationReconciler) reconcileDeployment(
 	req reconcile.Request,
 	appToReconcile *operatorsv1alpha1.Application,
 ) (*reconcile.Result, error) {
-	log := log.FromContext(ctx).WithValues("application", req.NamespacedName.String())
+	log := log.FromContext(ctx)
 	deploy := &appsv1.Deployment{}
 	err := r.Get(ctx, req.NamespacedName, deploy)
 
@@ -104,10 +104,13 @@ func (r *ApplicationReconciler) reconcileDeployment(
 			meta.SetStatusCondition(
 				&appToReconcile.Status.Conditions,
 				metav1.Condition{
-					Type:    typeDeploymentAvailable,
-					Status:  metav1.ConditionFalse,
-					Reason:  "ReconcileError",
-					Message: "Failed to create deployment",
+					Type:   typeDeploymentAvailable,
+					Status: metav1.ConditionFalse,
+					Reason: "ReconcileError",
+					Message: fmt.Sprintf(
+						"Failed to create deployment: %s",
+						err.Error(),
+					),
 				},
 			)
 
@@ -137,6 +140,24 @@ func (r *ApplicationReconciler) reconcileDeployment(
 		return r.setApplicationReconcileError(ctx, req, appToReconcile, log, err)
 	}
 
+	return r.setApplicationReconciled(ctx, req, appToReconcile, log)
+}
+
+func (r *ApplicationReconciler) setApplicationReconciled(
+	ctx context.Context,
+	req reconcile.Request,
+	appToReconcile *operatorsv1alpha1.Application,
+	log logr.Logger,
+) (*reconcile.Result, error) {
+	// Re-fetch the Resource before update the status
+	// so that we have the latest state of the resource on the cluster and we will avoid
+	// raise the issue "the object has been modified, please apply
+	// your changes to the latest version and try again" which would re-trigger the reconciliation
+	if err := r.Get(ctx, req.NamespacedName, appToReconcile); err != nil {
+		log.Error(err, "failed to re-fetch application")
+		return &reconcile.Result{}, err
+	}
+
 	meta.SetStatusCondition(
 		&appToReconcile.Status.Conditions,
 		metav1.Condition{
@@ -151,7 +172,7 @@ func (r *ApplicationReconciler) reconcileDeployment(
 		})
 
 	if err := r.Status().Update(ctx, appToReconcile); err != nil {
-		log.Error(err, "failed to update Memcached status")
+		log.Error(err, "failed to update application status")
 		return nil, err
 	}
 
@@ -162,7 +183,7 @@ func (r *ApplicationReconciler) createDeployment(
 	ctx context.Context,
 	appToReconcile *operatorsv1alpha1.Application,
 ) (*appsv1.Deployment, error) {
-	log := log.FromContext(ctx).WithValues("application", appToReconcile.Name)
+	log := log.FromContext(ctx)
 
 	deployment, err := r.buildDeployment(ctx, appToReconcile)
 	if err != nil {
@@ -185,10 +206,9 @@ func (r *ApplicationReconciler) buildDeployment(
 	ctx context.Context,
 	appToReconcile *operatorsv1alpha1.Application,
 ) (*appsv1.Deployment, error) {
-	imageTag := appToReconcile.Spec.Runtime.Image
 	labels := map[string]string{
 		"app.kubernetes.io/instance":   fmt.Sprintf("application-%s", appToReconcile.Name),
-		"app.kubernetes.io/version":    imageTag,
+		"app.kubernetes.io/version":    appToReconcile.Spec.Runtime.Image.Tag(),
 		"app.kubernetes.io/part-of":    "k4indie-operator",
 		"app.kubernetes.io/created-by": "controller-manager",
 	}
@@ -221,7 +241,7 @@ func (r *ApplicationReconciler) buildDeployment(
 						},
 					},
 					Containers: []corev1.Container{{
-						Image:           imageTag,
+						Image:           appToReconcile.Spec.Runtime.Image.String(),
 						Name:            "application",
 						ImagePullPolicy: corev1.PullIfNotPresent,
 						SecurityContext: &corev1.SecurityContext{
@@ -302,7 +322,7 @@ func (r *ApplicationReconciler) setApplicationReconcileError(
 	log logr.Logger,
 	err error,
 ) (*reconcile.Result, error) {
-	// Re-fetch the memcached Custom Resource before update the status
+	// Re-fetch the Resource before update the status
 	// so that we have the latest state of the resource on the cluster and we will avoid
 	// raise the issue "the object has been modified, please apply
 	// your changes to the latest version and try again" which would re-trigger the reconciliation
@@ -325,7 +345,7 @@ func (r *ApplicationReconciler) setApplicationReconcileError(
 		})
 
 	if err := r.Status().Update(ctx, appToReconcile); err != nil {
-		log.Error(err, "failed to update Memcached status")
+		log.Error(err, "failed to update application status")
 		return nil, err
 	}
 

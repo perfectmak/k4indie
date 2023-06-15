@@ -26,7 +26,7 @@ type ApplicationRuntime struct {
 	Size RuntimeSize `json:"size,omitempty"`
 
 	// Container image to use for this application.
-	Image string `json:"image,omitempty"`
+	Image RuntimeImage `json:"image,omitempty"`
 }
 
 // ApplicationSpec defines the desired state of Application
