@@ -1,5 +1,7 @@
 package v1alpha1
 
+import "errors"
+
 // +kubebuilder:validation:Enum=basic;basic-2x;standard-2x;performance
 type RuntimeSize string
 
@@ -24,3 +26,5 @@ var RuntimeSizes = map[RuntimeSize]struct{}{
 	Standard2xMachineType:  {},
 	PerformanceMachineType: {},
 }
+
+var ErrInvalidRuntimeSize = errors.New("invalid runtime size")

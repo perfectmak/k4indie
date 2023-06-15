@@ -24,23 +24,36 @@ type ApplicationRuntime struct {
 	// Size is the type of resources required to the application should run on.
 	// Possible values are from the predefined types.
 	Size RuntimeSize `json:"size,omitempty"`
+
+	// Container image to use for this application.
+	Image string `json:"image,omitempty"`
 }
 
 // ApplicationSpec defines the desired state of Application
 type ApplicationSpec struct {
+	// Replicas is the number of instances of this application that should be created.
+	// +operator-sdk:csv:customresourcedefinitions:type=spec
+	Replicas int32 `json:"replicas,omitempty"`
+
 	// Runtime configuration to run this application.
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
 	Runtime ApplicationRuntime `json:"runtime,omitempty"`
 
-	// Replicas is the number of instances of this application that should be created.
+	// Endpoints is the list of ports and domains that this application should expose.
+	// It can be left empty for workers that don't need to expose an endpoint.
+	// Metrics endpoints should be exposed using this as well.
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
-	Replicas string `json:"replicas,omitempty"`
+	Endpoints ApplicationEndpoints `json:"endpoints,omitempty"`
+
+	// Command to launch or startup the application.
+	LaunchCommand []string `json:"command,omitempty"`
 }
 
 // ApplicationStatus defines the observed state of Application
 type ApplicationStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// Conditions store the status conditions of the Memcached instances
+	// +operator-sdk:csv:customresourcedefinitions:type=status
+	Conditions []metav1.Condition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type" protobuf:"bytes,1,rep,name=conditions"`
 }
 
 //+kubebuilder:object:root=true

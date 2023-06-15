@@ -1,12 +1,15 @@
 apiVersion: operators.k4indie.io/v1alpha1
 kind: Application
 metadata:
-  labels:
-    app.kubernetes.io/name: application
-    app.kubernetes.io/instance: application-sample
-    app.kubernetes.io/part-of: operator
-    app.kubernetes.io/managed-by: kustomize
-    app.kubernetes.io/created-by: operator
   name: application-sample
 spec:
-  # TODO(user): Add fields here
+  # Sample application deploys an nginx server
+  endpoints:
+  - domain: demo.k4indie.io
+    port: 80
+  replicas: 1
+  # command: []
+  runtime:
+    image: nginxdemos/hello
+    size: basic
+

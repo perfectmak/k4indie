@@ -35,13 +35,39 @@ spec:
           spec:
             description: ApplicationSpec defines the desired state of Application
             properties:
+              command:
+                description: Command to launch or startup the application.
+                items:
+                  type: string
+                type: array
+              endpoints:
+                description: Endpoints is the list of ports and domains that this
+                  application should expose. It can be left empty for workers that
+                  don't need to expose an endpoint. Metrics endpoints should be exposed
+                  using this as well.
+                items:
+                  properties:
+                    domain:
+                      description: Domain to expose this endpoint on. Leave empty
+                        if the application should not be exposed on the internet.
+                      type: string
+                    port:
+                      description: Port to expose this endpoint on.
+                      format: int32
+                      type: integer
+                  type: object
+                type: array
               replicas:
                 description: Replicas is the number of instances of this application
                   that should be created.
-                type: string
+                format: int32
+                type: integer
               runtime:
                 description: Runtime configuration to run this application.
                 properties:
+                  image:
+                    description: Container image to use for this application.
+                    type: string
                   size:
                     description: Size is the type of resources required to the application
                       should run on. Possible values are from the predefined types.
@@ -55,6 +81,77 @@ spec:
             type: object
           status:
             description: ApplicationStatus defines the observed state of Application
+            properties:
+              conditions:
+                description: Conditions store the status conditions of the Memcached
+                  instances
+                items:
+                  description: "Condition contains details for one aspect of the current
+                    state of this API Resource. --- This struct is intended for direct
+                    use as an array at the field path .status.conditions.  For example,
+                    \n type FooStatus struct{ // Represents the observations of a
+                    foo's current state. // Known .status.conditions.type are: \"Available\",
+                    \"Progressing\", and \"Degraded\" // +patchMergeKey=type // +patchStrategy=merge
+                    // +listType=map // +listMapKey=type Conditions []metav1.Condition
+                    `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\"
+                    protobuf:\"bytes,1,rep,name=conditions\"` \n // other fields }"
+                  properties:
+                    lastTransitionTime:
+                      description: lastTransitionTime is the last time the condition
+                        transitioned from one status to another. This should be when
+                        the underlying condition changed.  If that is not known, then
+                        using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: message is a human readable message indicating
+                        details about the transition. This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: observedGeneration represents the .metadata.generation
+                        that the condition was set based upon. For instance, if .metadata.generation
+                        is currently 12, but the .status.conditions[x].observedGeneration
+                        is 9, the condition is out of date with respect to the current
+                        state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: reason contains a programmatic identifier indicating
+                        the reason for the condition's last transition. Producers
+                        of specific condition types may define expected values and
+                        meanings for this field, and whether the values are considered
+                        a guaranteed API. The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                        --- Many .condition.type values are consistent across resources
+                        like Available, but because arbitrary conditions can be useful
+                        (see .node.status.conditions), the ability to deconflict is
+                        important. The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
             type: object
         type: object
     served: true
