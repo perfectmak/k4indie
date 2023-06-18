@@ -51,6 +51,7 @@ var (
 //+kubebuilder:rbac:groups=operators.k4indie.io,resources=applications/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=operators.k4indie.io,resources=applications/finalizers,verbs=update
 //+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=core,resources=services,verbs=get;list;watch;create;update;patch;delete
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -88,7 +89,7 @@ func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return *result, nil
 	}
 
-	return ctrl.Result{}, nil
+	return r.setApplicationReconciled(ctx, req, appToReconcile, log)
 }
 
 func (r *ApplicationReconciler) setApplicationReconciled(
@@ -96,14 +97,14 @@ func (r *ApplicationReconciler) setApplicationReconciled(
 	req reconcile.Request,
 	appToReconcile *operatorsv1alpha1.Application,
 	log logr.Logger,
-) (*reconcile.Result, error) {
+) (reconcile.Result, error) {
 	// Re-fetch the Resource before update the status
 	// so that we have the latest state of the resource on the cluster and we will avoid
 	// raise the issue "the object has been modified, please apply
 	// your changes to the latest version and try again" which would re-trigger the reconciliation
 	if err := r.Get(ctx, req.NamespacedName, appToReconcile); err != nil {
 		log.Error(err, "failed to re-fetch application")
-		return &reconcile.Result{}, err
+		return reconcile.Result{}, err
 	}
 
 	meta.SetStatusCondition(
@@ -121,10 +122,10 @@ func (r *ApplicationReconciler) setApplicationReconciled(
 
 	if err := r.Status().Update(ctx, appToReconcile); err != nil {
 		log.Error(err, "failed to update application status")
-		return nil, err
+		return reconcile.Result{}, err
 	}
 
-	return nil, nil
+	return reconcile.Result{}, nil
 }
 
 func (r *ApplicationReconciler) setApplicationReconcileError(

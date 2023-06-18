@@ -18,16 +18,18 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
+// reconcileDeployment attempts to create a deployment for the application
+// if it does not exist. And if it does, it tries to update the deployment
+// schema to match the application spec.
 func (r *ApplicationReconciler) reconcileDeployment(
 	ctx context.Context,
 	req reconcile.Request,
 	appToReconcile *operatorsv1alpha1.Application,
 ) (*reconcile.Result, error) {
 	log := log.FromContext(ctx)
-	deploy := &appsv1.Deployment{}
-	err := r.Get(ctx, req.NamespacedName, deploy)
-
 	deployment := &appsv1.Deployment{}
+	err := r.Get(ctx, req.NamespacedName, deployment)
+
 	if err != nil && apierrors.IsNotFound(err) {
 		deployment, err = r.createDeployment(ctx, appToReconcile)
 		if err != nil {
@@ -54,7 +56,7 @@ func (r *ApplicationReconciler) reconcileDeployment(
 			return nil, err
 		}
 
-		// Re=enqueue the request to check the status of the deployment
+		// Re-enqueue the request to check the status of the deployment
 		return &reconcile.Result{RequeueAfter: time.Minute}, nil
 	} else if err != nil {
 		log.Error(err, "failed to get deployment")
@@ -72,7 +74,7 @@ func (r *ApplicationReconciler) reconcileDeployment(
 		return r.setApplicationReconcileError(ctx, req, appToReconcile, log, err)
 	}
 
-	return r.setApplicationReconciled(ctx, req, appToReconcile, log)
+	return nil, nil
 }
 
 func (r *ApplicationReconciler) createDeployment(
@@ -102,12 +104,12 @@ func (r *ApplicationReconciler) buildDeployment(
 	ctx context.Context,
 	appToReconcile *operatorsv1alpha1.Application,
 ) (*appsv1.Deployment, error) {
-	labels := map[string]string{
-		"app.kubernetes.io/instance":   fmt.Sprintf("application-%s", appToReconcile.Name),
-		"app.kubernetes.io/version":    appToReconcile.Spec.Runtime.Image.Tag(),
-		"app.kubernetes.io/part-of":    "k4indie-operator",
-		"app.kubernetes.io/created-by": "controller-manager",
-	}
+	labels := resolvers.MergeDefaultLabels(
+		appToReconcile.Labels,
+		map[string]string{
+			"app.kubernetes.io/instance": appToReconcile.Name,
+			"app.kubernetes.io/version":  appToReconcile.Spec.Runtime.Image.Tag(),
+		})
 	resourcesRequired, err := resolvers.GetResourcesForRuntimeSize(
 		appToReconcile.Spec.Runtime.Size,
 	)
@@ -119,6 +121,7 @@ func (r *ApplicationReconciler) buildDeployment(
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      appToReconcile.Name,
 			Namespace: appToReconcile.Namespace,
+			Labels:    labels,
 		},
 		Spec: appsv1.DeploymentSpec{
 			Replicas: &appToReconcile.Spec.Replicas,

@@ -33,3 +33,21 @@ func (e *ApplicationEndpoints) AsContainerPorts() []corev1.ContainerPort {
 
 	return ports
 }
+
+func (e *ApplicationEndpoint) AsServicePort() corev1.ServicePort {
+	return corev1.ServicePort{
+		Name:     fmt.Sprintf("port%d", e.Port),
+		Port:     e.Port,
+		Protocol: corev1.ProtocolTCP,
+	}
+}
+
+func (e *ApplicationEndpoints) AsServicePorts() []corev1.ServicePort {
+	ports := make([]corev1.ServicePort, len(*e))
+
+	for i, endpoint := range *e {
+		ports[i] = endpoint.AsServicePort()
+	}
+
+	return ports
+}
