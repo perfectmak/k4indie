@@ -258,3 +258,8 @@ catalog-build: opm ## Build a catalog image.
 .PHONY: catalog-push
 catalog-push: ## Push a catalog image.
 	$(MAKE) docker-push IMG=$(CATALOG_IMG)
+
+# Build and deploys the sample operator to the K8s cluster specified in ~/.kube/config.
+.PHONY: refresh-sample
+refresh-sample: docker-build docker-push deploy
+	kubectl apply -f config/samples/operators_v1alpha1_application.yaml

@@ -5,7 +5,11 @@ metadata:
 spec:
   # Sample application deploys an nginx server
   endpoints:
+  - port: 9090
   - domain: demo.k4indie.io
+    port: 8080
+  - domain: savekoin.io
+    domain_path: /demo-2
     port: 8080
   replicas: 1
   # command: []

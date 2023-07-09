@@ -46,10 +46,17 @@ spec:
                   don't need to expose an endpoint. Metrics endpoints should be exposed
                   using this as well.
                 items:
+                  description: Endpoints exposed by the application to be exposed
+                    on the internet.
                   properties:
                     domain:
                       description: Domain to expose this endpoint on. Leave empty
                         if the application should not be exposed on the internet.
+                      type: string
+                    domain_path:
+                      default: /
+                      description: Path to access on the domain to expose this endpoint
+                        on. By default it will be exposed on '/' root path.
                       type: string
                     port:
                       description: Port to expose this endpoint on.

@@ -45,7 +45,7 @@ func (r *ApplicationReconciler) reconcileService(
 		return &reconcile.Result{}, nil
 
 	} else if err != nil {
-		log.Error(err, "failed to get service")
+		log.Error(err, "failed to get existing service")
 		return nil, err
 	}
 
