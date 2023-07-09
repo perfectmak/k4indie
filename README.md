@@ -1,14 +1,47 @@
-# operator
-// TODO(user): Add simple overview of use/purpose
+# K4Indie 👷🏼‍♀️☸️ 
+
+K4Indie _(Kay-for-Indie_)_ is a Kubernetes operator to simplify the deployment of applications to Kubernetes. 
+
+> 🚧🚧 This is not production ready and is still heavily a work in progress. Check the open issues for WIP and Roadmap 🚧🚧 
 
 ## Description
-// TODO(user): An in-depth paragraph about your project and overview of use
+K4Indie is focused on bringing a simple Heroku-like experience to deploy and run applications. This makes it a perfect candidate to run your application on cheap cloud-hosted Kubernetes platforms like DigitalOcean.
+
+It exports a Custom Resource named `Application` that can be used to define an application's requirement.
+After the Application resource is applied to the Kubernetes cluster, K4Indie will set up all the required native resources to ensure your application is running and accessible to the internet (in cases where that is necessary).
 
 ## Getting Started
+First, install this operator and its custom resource definitions in your cluster:
+
+> TBD: It is yet to be packaged for re-distribution, but you can the instructions on the 'Deploying to the Cluster' for how to deploy from this repository
+
+
+Next, to make your application accessible to the internet, you'll need
+to install an Ingress controller. An easy one to install is [nginx-ingress](https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/).
+
+> The step to install ingress controller will not be required in upcoming releases because it will be bundled as part of K4Indie.
+
+The Kubernetes cluster is not ready to deploy applications. There are sample application definitions in the `config/samples`. Try deploying the nginx sample application by running the following command:
+
+```
+kubectl apply -f config/samples/operators_v1alpha1_nginx.yaml
+```
+
+Visit port `8080` of the cluster's IP address to preview the application.
+
+## `Application` Specification
+The major resource for managing application workloads is the `Application` resource. 
+
+> A proper specification document coming up soon. In the meantime, the OpenAPI Schema can be found [here](config/crd/bases/operators.k4indie.io_applications.yaml). Also, explore the `config/samples` directory for some example Application definitions.
+
+## Contributing
 You’ll need a Kubernetes cluster to run against. You can use [KIND](https://sigs.k8s.io/kind) to get a local cluster for testing, or run against a remote cluster.
+
 **Note:** Your controller will automatically use the current context in your kubeconfig file (i.e. whatever cluster `kubectl cluster-info` shows).
 
-### Running on the cluster
+Before making a contribution, please open an issue to discuss your plans and get feedback.
+
+### Deploying to the cluster
 1. Install Instances of Custom Resources:
 
 ```sh
@@ -40,9 +73,6 @@ UnDeploy the controller from the cluster:
 ```sh
 make undeploy
 ```
-
-## Contributing
-// TODO(user): Add detailed information on how you would like others to contribute to this project
 
 ### How it works
 This project aims to follow the Kubernetes [Operator pattern](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/).

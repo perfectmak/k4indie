@@ -1,0 +1,14 @@
+apiVersion: operators.k4indie.io/v1alpha1
+kind: Application
+metadata:
+  name: application-sample
+spec:
+  # Sample application deploys an nginx server
+  endpoints:
+  - port: 8080
+  replicas: 1
+  # command: []
+  runtime:
+    image: nginxinc/nginx-unprivileged
+    size: basic
+
